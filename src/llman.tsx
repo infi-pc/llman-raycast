@@ -1,5 +1,6 @@
-import { getSelectedText, Clipboard, showToast, Toast, AI, List, ActionPanel, Action, Detail } from "@raycast/api";
+import { getSelectedText, Clipboard, showToast, Toast, List, ActionPanel, Action, Detail } from "@raycast/api";
 import { useEffect, useState } from "react";
+import ask from "./ask";
 
 function useDebounce(value: string, timeout: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -48,7 +49,7 @@ export default function Command() {
       }
 
       const noPrompts = debouncedSearchText ? 1 : 10;
-      const res = await AI.ask(
+      const res = await ask(
         `I am using GPT to transform text. I will give you text, and you will give me ${noPrompts} prompts for transformations that can be done with the text. 
         Text can be code, raw data, written text or any other data in text format. 
         Prompts can be for example: 
@@ -62,10 +63,11 @@ export default function Command() {
 
         Don't say anything else than the prompts.
 
-      Now here is the text and you give me the ${noPrompts} prompts, one per line: \`${selectedText}\``,
-        {
-          model: "gpt-3.5-turbo",
-        }
+      Now here is the text and you give me the ${noPrompts} prompts, one per line: 
+      \`\`\`
+      ${selectedText}
+      \`\`\`
+      `
       );
 
       if (debouncedSearchText === searchText) {
@@ -121,15 +123,12 @@ export default function Command() {
                     title="Apply"
                     onAction={async () => {
                       setProcessingAction(true);
-                      const res = await AI.ask(
+                      const res = await ask(
                         `I will give you text, you will apply this action on it: \`${action}\`. 
                         Try to include only one code snippet and put it into markdown code block. 
                         The code snippet can be used to directly replace the original text, so unless it is explicitely said, try too keep the original data and change only what is said in the "action". 
 
-                        Text:\`${await getSelectedText()}\``,
-                        {
-                          model: "gpt-3.5-turbo",
-                        }
+                        Text:\`${await getSelectedText()}\``
                       );
                       setResults(res);
                       // Clipboard.paste(res);
