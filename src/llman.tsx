@@ -1,6 +1,7 @@
 import { getSelectedText, Clipboard, showToast, Toast, List, ActionPanel, Action, Detail } from "@raycast/api";
 import { useEffect, useState } from "react";
 import ask from "./ask";
+import { matchResults } from "./matchResults";
 
 function useDebounce(value: string, timeout: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -85,8 +86,7 @@ export default function Command() {
   }, [debouncedSearchText]);
 
   if (results) {
-    const codeResult = results.match(/```(.*)```/s);
-    const codeResultString = codeResult ? codeResult[1] : null;
+    const codeResultString = matchResults(results);
     return (
       <Detail
         markdown={results}
