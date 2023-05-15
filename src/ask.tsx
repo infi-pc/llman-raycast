@@ -33,7 +33,7 @@ export default async function ask(prompt: string): Promise<string> {
           },
         ],
         temperature: 0.6,
-        max_tokens: 100,
+        max_tokens: 2000,
         top_p: 1,
       })
       .catch((err) => {

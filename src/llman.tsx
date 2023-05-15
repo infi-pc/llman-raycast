@@ -48,7 +48,7 @@ export default function Command() {
         return;
       }
 
-      const noPrompts = debouncedSearchText ? 1 : 10;
+      const noPrompts = debouncedSearchText ? 3 : 10;
       const res = await ask(
         `I am using GPT to transform text. I will give you text, and you will give me ${noPrompts} prompts for transformations that can be done with the text. 
         Text can be code, raw data, written text or any other data in text format. 
@@ -106,12 +106,42 @@ export default function Command() {
     );
   }
 
+  async function runAction(action: string) {
+    setProcessingAction(true);
+    const res = await ask(
+      `I will give you text, you will apply this action on it: \`${action}\`. 
+                        Try to include only one code snippet and put it into markdown code block. 
+                        The code snippet can be used to directly replace the original text, so unless it is explicitely said, try too keep the original data and change only what is said in the "action". 
+
+                        Text:\`${await getSelectedText()}\``
+    );
+    setResults(res);
+    setProcessingAction(false);
+  }
+
   return (
     <List
       isLoading={actions.status === "loading" || processingAction}
       onSearchTextChange={(text) => setSearchText(text)}
     >
-      {actions.status === "success"
+      {searchText ? (
+        <List.Item
+          key={searchText}
+          title={searchText}
+          subtitle={`#1`}
+          actions={
+            <ActionPanel>
+              <Action
+                title="Apply"
+                onAction={async () => {
+                  runAction(searchText);
+                }}
+              />
+            </ActionPanel>
+          }
+        />
+      ) : null}
+      {actions.status === "success" && !processingAction
         ? actions.data.map((action, index) => (
             <List.Item
               key={index}
@@ -122,17 +152,7 @@ export default function Command() {
                   <Action
                     title="Apply"
                     onAction={async () => {
-                      setProcessingAction(true);
-                      const res = await ask(
-                        `I will give you text, you will apply this action on it: \`${action}\`. 
-                        Try to include only one code snippet and put it into markdown code block. 
-                        The code snippet can be used to directly replace the original text, so unless it is explicitely said, try too keep the original data and change only what is said in the "action". 
-
-                        Text:\`${await getSelectedText()}\``
-                      );
-                      setResults(res);
-                      // Clipboard.paste(res);
-                      setProcessingAction(false);
+                      runAction(action);
                     }}
                   />
                 </ActionPanel>
