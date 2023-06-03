@@ -29,7 +29,7 @@ export default function Command() {
     status: "loading",
   });
 
-  const debouncedSearchText = useDebounce(searchText, 500);
+  const debouncedSearchText = useDebounce(searchText, 1000);
 
   const [results, setResults] = useState<string | null>(null);
 
@@ -123,6 +123,7 @@ export default function Command() {
     <List
       isLoading={actions.status === "loading" || processingAction}
       onSearchTextChange={(text) => setSearchText(text)}
+      searchBarPlaceholder="Type in custom prompt"
     >
       {searchText ? (
         <List.Item

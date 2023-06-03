@@ -32,9 +32,8 @@ export default async function ask(prompt: string): Promise<string> {
             content: prompt,
           },
         ],
-        temperature: 0.6,
+        temperature: 0,
         max_tokens: 2000,
-        top_p: 1,
       })
       .catch((err) => {
         console.error(err.response.data);
