@@ -22,6 +22,10 @@ export default function Command() {
         status: "loading";
       }
     | {
+        status: "streaming";
+        data: string[];
+      }
+    | {
         status: "success";
         data: string[];
       }
@@ -31,7 +35,10 @@ export default function Command() {
 
   const debouncedSearchText = useDebounce(searchText, 1000);
 
-  const [results, setResults] = useState<string | null>(null);
+  const [results, setResults] = useState<{
+    text: string;
+    status: "streaming" | "success";
+  } | null>(null);
 
   const [processingAction, setProcessingAction] = useState(false);
   useEffect(() => {
@@ -50,7 +57,7 @@ export default function Command() {
       }
 
       const noPrompts = debouncedSearchText ? 3 : 10;
-      const res = await ask(
+      const resPromise = ask(
         `I am using GPT to transform text. I will give you text, and you will give me ${noPrompts} prompts for transformations that can be done with the text. 
         Text can be code, raw data, written text or any other data in text format. 
         Prompts can be for example: 
@@ -71,6 +78,14 @@ export default function Command() {
       `
       );
 
+      resPromise.on("data", (data) => {
+        setActions({
+          status: "streaming",
+          data: data.trim().split("\n"),
+        });
+      });
+
+      const res = await resPromise;
       if (debouncedSearchText === searchText) {
         setActions({
           status: "success",
@@ -86,10 +101,11 @@ export default function Command() {
   }, [debouncedSearchText]);
 
   if (results) {
-    const codeResultString = matchResults(results);
+    const codeResultString = matchResults(results.text);
     return (
       <Detail
-        markdown={results}
+        markdown={results.text}
+        isLoading={results.status === "streaming"}
         actions={
           codeResultString ? (
             <ActionPanel>
@@ -108,20 +124,33 @@ export default function Command() {
 
   async function runAction(action: string) {
     setProcessingAction(true);
-    const res = await ask(
+    const resPromise = ask(
       `I will give you text, you will apply this action on it: \`${action}\`. 
                         Try to include only one code snippet and put it into markdown code block. 
                         The code snippet can be used to directly replace the original text, so unless it is explicitely said, try too keep the original data and change only what is said in the "action". 
 
                         Text:\`${await getSelectedText()}\``
     );
-    setResults(res);
+
+    resPromise.on("data", (data) => {
+      setResults({
+        text: data,
+        status: "streaming",
+      });
+    });
+
+    const res = await resPromise;
+    setResults({
+      text: res,
+      status: "success",
+    });
+
     setProcessingAction(false);
   }
 
   return (
     <List
-      isLoading={actions.status === "loading" || processingAction}
+      isLoading={actions.status === "loading" || actions.status === "streaming" || processingAction}
       onSearchTextChange={(text) => setSearchText(text)}
       searchBarPlaceholder="Type in custom prompt"
     >
@@ -142,7 +171,7 @@ export default function Command() {
           }
         />
       ) : null}
-      {actions.status === "success" && !processingAction
+      {(actions.status === "success" || actions.status === "streaming") && !processingAction
         ? actions.data.map((action, index) => (
             <List.Item
               key={index}
