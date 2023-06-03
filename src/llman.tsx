@@ -58,20 +58,18 @@ export default function Command() {
 
       const noPrompts = debouncedSearchText ? 3 : 10;
       const resPromise = ask(
-        `I am using GPT to transform text. I will give you text, and you will give me ${noPrompts} prompts for transformations that can be done with the text. 
-        Text can be code, raw data, written text or any other data in text format. 
-        Prompts can be for example: 
-        "Convert CSS to CSS-in-JS format" if you recognise the text is CSS, 
-        "Convert json to yaml" in case the text is JSON, 
-        "Make the text more formal" for written texts, 
-        "Fix grammar" in case you see some grammar issues, 
-        "Fix syntax errors" in case it is a code and you see it has syntax errors etc. 
+        `I am using GPT to transform text. Please provide ${noPrompts} prompts for transformations that can be done with the given text. 
+        The text can be in any format such as code, raw data, written text, etc. 
+        For example, prompts can be: 
+        - "Convert CSS to CSS-in-JS format" if the text is CSS
+        - "Convert JSON to YAML" if the text is JSON
+        - "Make the text more formal" for written texts
+        - "Fix grammar" if there are grammar issues
+        - "Fix syntax errors" if it is code and there are syntax errors, etc. 
 
-        ${debouncedSearchText ? `I search for prompts containing the text "${debouncedSearchText}"` : ""}
+        ${debouncedSearchText ? `I am searching for prompts containing the text "${debouncedSearchText}"` : ""}
 
-        Don't say anything else than the prompts.
-
-      Now here is the text and you give me the ${noPrompts} prompts, one per line: 
+        Please provide the ${noPrompts} prompts, one per line, for the following text: 
       \`\`\`
       ${selectedText}
       \`\`\`
@@ -128,6 +126,7 @@ export default function Command() {
       `I will give you text, you will apply this action on it: \`${action}\`. 
                         Try to include only one code snippet and put it into markdown code block. 
                         The code snippet can be used to directly replace the original text, so unless it is explicitely said, try too keep the original data and change only what is said in the "action". 
+                        For example, if the action is "Convert CSS to CSS-in-JS format", then you should only change the CSS part of the code snippet and keep the rest of the code as it is. Or if the action is to correct grammar, but the input is code, then you should only correct the grammar in the comments and string literals and keep the code as it is.
 
                         Text:\`${await getSelectedText()}\``
     );
