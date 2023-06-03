@@ -66,6 +66,13 @@ export default function Command() {
         - "Make the text more formal" for written texts
         - "Fix grammar" if there are grammar issues
         - "Fix syntax errors" if it is code and there are syntax errors, etc. 
+        - "Rewrite text to twitter format" if the text something that can be posted on twitter
+        - "Rewrite text to be more formal" if the text is informal
+        - "Rewrite text to be more casual" if the text is formal
+        - "Make bullet points" if the text is long and can be converted to bullet points
+        - "Add more options" if the text is a list
+
+        Don't try to offer code related prompts if the text is not code.
 
         ${debouncedSearchText ? `I am searching for prompts containing the text "${debouncedSearchText}"` : ""}
 

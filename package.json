@@ -1,15 +1,15 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "llman",
-  "title": "LLMan",
-  "description": "LLMan - Raycast extension",
+  "name": "select-transform-replace",
+  "title": "Select-Transform-Replace",
+  "description": "Select any text, transform with LLM/AI, replace the original text, or paste anywhere else. Works out-of-the box for Raycast Pro users, or bring your own OpenAI key.",
   "icon": "command-icon.png",
   "author": "michael_vp",
   "license": "MIT",
   "commands": [
     {
       "name": "llman",
-      "title": "Transform text with LLMan",
+      "title": "Transform selected text",
       "description": "",
       "mode": "view"
     }
